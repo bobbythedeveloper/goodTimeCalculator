@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/urlfetch"
@@ -28,14 +29,23 @@ func getKaalam(w http.ResponseWriter, r *http.Request) {
 	longitude := float64(-4.4203400)
 
 	sunrise, sunset := getSunriseAndSunset(latitude, longitude, client)
+	guliKaala, yamaGantaKaala, rahuKaala := getKallas(sunrise, sunset, time.Now())
+
 	log.Println(sunrise)
 	log.Println(sunset)
+
+	log.Println(guliKaala)
+	log.Println(yamaGantaKaala)
+	log.Println(rahuKaala)
+
+}
+func getKallas(sunrise string, sunset string, date time.Time) (string, string, string) {
+	return "", "", ""
 }
 
 func getSunriseAndSunset(lat float64, longt float64, client *http.Client) (string, string) {
 	latstr := fmt.Sprintf("%f", lat)
 	longstr := fmt.Sprintf("%f", longt)
-
 	//http://api.sunrise-sunset.org/json?lat=36.7201600&lng=-4.4203400&date=2016-12-26
 	req, err := http.NewRequest("GET", "http://api.sunrise-sunset.org/json", nil)
 	if err != nil {
@@ -58,12 +68,10 @@ func getSunriseAndSunset(lat float64, longt float64, client *http.Client) (strin
 	var backendResponse *sunRiseSunSet
 	err = json.Unmarshal(body1, &backendResponse)
 	if err != nil {
-		log.Println("errpr")
+		log.Println("Error understanding backend json")
 		log.Fatal(err)
 	}
-	log.Println(backendResponse.Results.Sunrise)
-	// call backend and pass the latigude and logitude
-	return "", ""
+	return backendResponse.Results.Sunrise, backendResponse.Results.Sunset
 }
 
 type sunRiseSunSet struct {
