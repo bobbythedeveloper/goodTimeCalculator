@@ -24,9 +24,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 func getKaalam(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 	client := urlfetch.Client(ctx)
-
-	latitude := float64(36.7201600)
-	longitude := float64(-4.4203400)
+	//39.948184, -74.902575
+	latitude := float64(39.948184)
+	longitude := float64(-74.902575)
 
 	sunrise, sunset := getSunriseAndSunset(latitude, longitude, client)
 	guliKaala, yamaGantaKaala, rahuKaala := getKallas(sunrise, sunset, time.Now())
@@ -50,32 +50,38 @@ func getKallas(sunrise string, sunset string, date time.Time) (string, string, s
 		log.Println("error parsing time sunriseTime")
 		log.Fatal(err)
 	}
-	log.Println(sunsetTime.String())
-	log.Println(sunriseTime.String())
-	parts := (sunsetTime.Unix() - sunriseTime.Unix()) / 8
-	log.Println("first part -- before" + sunriseTime.String())
+	rahuKaalStartAndEndTime := getRahuKaal(sunriseTime, sunsetTime, date)
+	log.Println("Rahu kalll start " + rahuKaalStartAndEndTime.startTime.Format("3:04:05 PM"))
+	log.Println("Rahu kalll ends " + rahuKaalStartAndEndTime.endTime.Format("3:04:05 PM"))
 
-	firstpart := sunriseTime.Add(time.Duration(parts * 1000000000 * getRahuPosition(date)))
-	log.Println("first part --" + firstpart.String())
-	log.Println(date.Weekday())
 	return "", "", ""
+}
+func getRahuKaal(sunrise time.Time, sunset time.Time, date time.Time) kaalamType {
+	rahuKaalStartAndEndTime := kaalamType{}
+	parts := (sunset.Unix() - sunrise.Unix()) / 8
+
+	firstpart := sunrise.Add(time.Duration(parts * 1000000000 * getRahuPosition(date)))
+	//log.Println("first part --" + strconv.ParseInt(parts, 10, 64))
+	rahuKaalStartAndEndTime.startTime = firstpart
+	rahuKaalStartAndEndTime.endTime = rahuKaalStartAndEndTime.startTime.Add(time.Duration(parts * 1000000000))
+	return rahuKaalStartAndEndTime
 }
 func getRahuPosition(datetime time.Time) int64 {
 	switch datetime.Weekday() {
 	case time.Monday:
-		return 2
+		return 0
 	case time.Tuesday:
-		return 7
-	case time.Wednesday:
 		return 5
-	case time.Thursday:
-		return 6
-	case time.Friday:
-		return 4
-	case time.Saturday:
+	case time.Wednesday:
 		return 3
+	case time.Thursday:
+		return 4
+	case time.Friday:
+		return 2
+	case time.Saturday:
+		return 1
 	case time.Sunday:
-		return 8
+		return 6
 	}
 
 	return 1
@@ -126,4 +132,9 @@ type sunRiseSunSet struct {
 		AstronomicalTwilightEnd   string `json:"astronomical_twilight_end"`
 	} `json:"results"`
 	Status string `json:"status"`
+}
+
+type kaalamType struct {
+	startTime time.Time
+	endTime   time.Time
 }
