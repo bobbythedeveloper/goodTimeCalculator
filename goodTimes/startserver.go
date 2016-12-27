@@ -31,8 +31,8 @@ func getKaalam(w http.ResponseWriter, r *http.Request) {
 	sunrise, sunset := getSunriseAndSunset(latitude, longitude, client)
 	guliKaala, yamaGantaKaala, rahuKaala := getKallas(sunrise, sunset, time.Now())
 
-	log.Println(sunrise)
-	log.Println(sunset)
+	log.Println("------------" + sunrise)
+	log.Println("------------" + sunset)
 
 	log.Println(guliKaala)
 	log.Println(yamaGantaKaala)
@@ -40,7 +40,45 @@ func getKaalam(w http.ResponseWriter, r *http.Request) {
 
 }
 func getKallas(sunrise string, sunset string, date time.Time) (string, string, string) {
+	sunriseTime, err := time.Parse("3:04:05 PM", sunrise)
+	if err != nil {
+		log.Println("error parsing time sunriseTime")
+		log.Fatal(err)
+	}
+	sunsetTime, err := time.Parse("3:04:05 PM", sunset)
+	if err != nil {
+		log.Println("error parsing time sunriseTime")
+		log.Fatal(err)
+	}
+	log.Println(sunsetTime.String())
+	log.Println(sunriseTime.String())
+	parts := (sunsetTime.Unix() - sunriseTime.Unix()) / 8
+	log.Println("first part -- before" + sunriseTime.String())
+
+	firstpart := sunriseTime.Add(time.Duration(parts * 1000000000 * getRahuPosition(date)))
+	log.Println("first part --" + firstpart.String())
+	log.Println(date.Weekday())
 	return "", "", ""
+}
+func getRahuPosition(datetime time.Time) int64 {
+	switch datetime.Weekday() {
+	case time.Monday:
+		return 2
+	case time.Tuesday:
+		return 7
+	case time.Wednesday:
+		return 5
+	case time.Thursday:
+		return 6
+	case time.Friday:
+		return 4
+	case time.Saturday:
+		return 3
+	case time.Sunday:
+		return 8
+	}
+
+	return 1
 }
 
 func getSunriseAndSunset(lat float64, longt float64, client *http.Client) (string, string) {
