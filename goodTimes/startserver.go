@@ -29,17 +29,19 @@ func getKaalam(w http.ResponseWriter, r *http.Request) {
 	longitude := float64(-74.902575)
 
 	sunrise, sunset := getSunriseAndSunset(latitude, longitude, client)
-	guliKaala, yamaGantaKaala, rahuKaala := getKallas(sunrise, sunset, time.Now())
+	rahuKaala := getKallas(sunrise, sunset, time.Now())
 
-	log.Println("------------" + sunrise)
-	log.Println("------------" + sunset)
+	log.Println("------------" + rahuKaala.startTime.Format("3:04:05 PM"))
+	log.Println("------------" + rahuKaala.endTime.Format("3:04:05 PM"))
 
-	log.Println(guliKaala)
-	log.Println(yamaGantaKaala)
-	log.Println(rahuKaala)
+	jsonresponse, err := json.Marshal(rahuKaala)
+	if err != nil {
+		log.Println("Error trying to write json response ")
+	}
+	fmt.Fprintf(w, string(jsonresponse))
 
 }
-func getKallas(sunrise string, sunset string, date time.Time) (string, string, string) {
+func getKallas(sunrise string, sunset string, date time.Time) kaalamType {
 	sunriseTime, err := time.Parse("3:04:05 PM", sunrise)
 	if err != nil {
 		log.Println("error parsing time sunriseTime")
@@ -54,7 +56,7 @@ func getKallas(sunrise string, sunset string, date time.Time) (string, string, s
 	log.Println("Rahu kalll start " + rahuKaalStartAndEndTime.startTime.Format("3:04:05 PM"))
 	log.Println("Rahu kalll ends " + rahuKaalStartAndEndTime.endTime.Format("3:04:05 PM"))
 
-	return "", "", ""
+	return rahuKaalStartAndEndTime
 }
 func getRahuKaal(sunrise time.Time, sunset time.Time, date time.Time) kaalamType {
 	rahuKaalStartAndEndTime := kaalamType{}
