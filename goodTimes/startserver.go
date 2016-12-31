@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"google.golang.org/appengine"
@@ -31,13 +32,15 @@ func getKaalam(w http.ResponseWriter, r *http.Request) {
 	sunrise, sunset := getSunriseAndSunset(latitude, longitude, client)
 	rahuKaala := getKallas(sunrise, sunset, time.Now())
 
-	log.Println("------------" + rahuKaala.startTime.Format("3:04:05 PM"))
-	log.Println("------------" + rahuKaala.endTime.Format("3:04:05 PM"))
+	response := ResponseJSON{}
+	response.RahuKaalEndTime = rahuKaala.endTime.Format("3:04:05 PM")
+	response.RahuKaalStartTime = rahuKaala.startTime.Format("3:04:05 PM")
 
-	jsonresponse, err := json.Marshal(rahuKaala)
+	jsonresponse, err := json.Marshal(&response)
 	if err != nil {
 		log.Println("Error trying to write json response ")
 	}
+	os.Stdout.Write(jsonresponse)
 	fmt.Fprintf(w, string(jsonresponse))
 
 }
@@ -53,8 +56,8 @@ func getKallas(sunrise string, sunset string, date time.Time) kaalamType {
 		log.Fatal(err)
 	}
 	rahuKaalStartAndEndTime := getRahuKaal(sunriseTime, sunsetTime, date)
-	log.Println("Rahu kalll start " + rahuKaalStartAndEndTime.startTime.Format("3:04:05 PM"))
-	log.Println("Rahu kalll ends " + rahuKaalStartAndEndTime.endTime.Format("3:04:05 PM"))
+	//log.Println("Rahu kalll start " + rahuKaalStartAndEndTime.startTime.Format("3:04:05 PM"))
+	//	log.Println("Rahu kalll ends " + rahuKaalStartAndEndTime.endTime.Format("3:04:05 PM"))
 
 	return rahuKaalStartAndEndTime
 }
@@ -139,4 +142,10 @@ type sunRiseSunSet struct {
 type kaalamType struct {
 	startTime time.Time
 	endTime   time.Time
+}
+
+// ResponseJSON object to be sent over network. Newer API to serialize in protobuf
+type ResponseJSON struct {
+	RahuKaalStartTime string `json:"rahuKaalStartTime"`
+	RahuKaalEndTime   string `json:"rahuKaalEndTime"`
 }
