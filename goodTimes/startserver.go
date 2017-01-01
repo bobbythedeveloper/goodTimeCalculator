@@ -33,8 +33,11 @@ func getKaalam(w http.ResponseWriter, r *http.Request) {
 	rahuKaala := getKallas(sunrise, sunset, time.Now())
 
 	response := ResponseJSON{}
-	response.RahuKaalEndTime = rahuKaala.endTime.Format("3:04:05 PM")
-	response.RahuKaalStartTime = rahuKaala.startTime.Format("3:04:05 PM")
+	//response.RahuKaalEndTime = rahuKaala.endTime.Format("3:04:05 PM")
+	//response.RahuKaalStartTime = rahuKaala.startTime.Format("3:04:05 PM")
+
+	response.RahuKaalEndTime = rahuKaala.endTime
+	response.RahuKaalStartTime = rahuKaala.startTime
 
 	jsonresponse, err := json.Marshal(&response)
 	if err != nil {
@@ -56,9 +59,6 @@ func getKallas(sunrise string, sunset string, date time.Time) kaalamType {
 		log.Fatal(err)
 	}
 	rahuKaalStartAndEndTime := getRahuKaal(sunriseTime, sunsetTime, date)
-	//log.Println("Rahu kalll start " + rahuKaalStartAndEndTime.startTime.Format("3:04:05 PM"))
-	//	log.Println("Rahu kalll ends " + rahuKaalStartAndEndTime.endTime.Format("3:04:05 PM"))
-
 	return rahuKaalStartAndEndTime
 }
 func getRahuKaal(sunrise time.Time, sunset time.Time, date time.Time) kaalamType {
@@ -146,6 +146,9 @@ type kaalamType struct {
 
 // ResponseJSON object to be sent over network. Newer API to serialize in protobuf
 type ResponseJSON struct {
-	RahuKaalStartTime string `json:"rahuKaalStartTime"`
-	RahuKaalEndTime   string `json:"rahuKaalEndTime"`
+	//RahuKaalStartTime string `json:"rahuKaalStartTime"`
+	//	RahuKaalEndTime   string `json:"rahuKaalEndTime"`
+
+	RahuKaalStartTime time.Time `json:"rahuKaalStartTime"`
+	RahuKaalEndTime   time.Time `json:"rahuKaalEndTime"`
 }
