@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
@@ -47,17 +46,10 @@ func getKaalam(w http.ResponseWriter, r *http.Request) {
 		date = time.Now()
 		log.Print(err)
 	}
-	//latitude := float64(39.948184)
-	//longitude := float64(-74.902575)
 
 	sunrise, sunset := getSunriseAndSunset(latitude, longitude, date, client)
-	//rahuKaala := getKallas(sunrise, sunset, time.Now())
 	rahuKaala := getKallas(sunrise, sunset, date)
-
 	response := ResponseJSON{}
-	//response.RahuKaalEndTime = rahuKaala.endTime.Format("3:04:05 PM")
-	//response.RahuKaalStartTime = rahuKaala.startTime.Format("3:04:05 PM")
-
 	response.RahuKaalEndTime = rahuKaala.endTime
 	response.RahuKaalStartTime = rahuKaala.startTime
 
@@ -65,7 +57,6 @@ func getKaalam(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error trying to write json response ")
 	}
-	os.Stdout.Write(jsonresponse)
 	fmt.Fprintf(w, string(jsonresponse))
 
 }
