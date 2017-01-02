@@ -26,6 +26,7 @@ func getKaalam(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	ctx := appengine.NewContext(r)
 	client := urlfetch.Client(ctx)
+
 	//39.948184, -74.902575
 	latitude, err := strconv.ParseFloat(r.URL.Query().Get("latitude"), 64)
 	if err != nil {

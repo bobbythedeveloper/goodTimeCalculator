@@ -23,11 +23,11 @@ func getSunriseAndSunset(lat float64, longt float64, date time.Time, client *htt
 	q.Add("lng", longstr)
 	q.Add("date", dateString)
 	req.URL.RawQuery = q.Encode()
+	//log.Println(req.URL.String())
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("Issue calling backend webservice")
 		log.Fatal(err)
-
 	}
 	body1, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
