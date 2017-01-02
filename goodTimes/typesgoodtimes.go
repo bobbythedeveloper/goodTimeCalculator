@@ -25,6 +25,10 @@ type kaalamType struct {
 
 // ResponseJSON object to be sent over network. Newer API to serialize in protobuf
 type ResponseJSON struct {
-	RahuKaalStartTime time.Time `json:"rahuKaalStartTime"`
-	RahuKaalEndTime   time.Time `json:"rahuKaalEndTime"`
+	RahuKaalStartTime      time.Time `json:"rahuKaalStartTime"`
+	RahuKaalEndTime        time.Time `json:"rahuKaalEndTime"`
+	YamagandaKallStartTime time.Time `json:"yamagandaKaalStartTime"`
+	YamagandaKallEndTime   time.Time `json:"yamagandaKaalEndTime"`
+	GulikaKallStartTime    time.Time `json:"gulikaKaalStartTime"`
+	GulikaKallEndTime      time.Time `json:"gulikaKaalEndTime"`
 }

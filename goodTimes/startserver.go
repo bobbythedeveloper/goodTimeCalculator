@@ -15,7 +15,6 @@ import (
 func init() {
 	http.HandleFunc("/getKaalam", getKaalam)
 	http.HandleFunc("/", handler)
-
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -48,10 +47,19 @@ func getKaalam(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sunrise, sunset := getSunriseAndSunset(latitude, longitude, date, client)
-	rahuKaala := getKallas(sunrise, sunset, date)
+	rahuKaala, yamaKaala, gulikaKaal := getKallas(sunrise, sunset, date)
 	response := ResponseJSON{}
-	response.RahuKaalEndTime = rahuKaala.endTime
-	response.RahuKaalStartTime = rahuKaala.startTime
+	location, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		log.Println("Cannot find location")
+		log.Println(err)
+	}
+	response.RahuKaalEndTime = rahuKaala.endTime.In(location)
+	response.RahuKaalStartTime = rahuKaala.startTime.In(location)
+	response.YamagandaKallStartTime = yamaKaala.startTime.In(location)
+	response.YamagandaKallEndTime = yamaKaala.endTime.In(location)
+	response.GulikaKallStartTime = gulikaKaal.startTime.In(location)
+	response.GulikaKallEndTime = gulikaKaal.endTime.In(location)
 
 	jsonresponse, err := json.Marshal(&response)
 	if err != nil {
@@ -60,8 +68,10 @@ func getKaalam(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(jsonresponse))
 
 }
-func getKallas(sunrise time.Time, sunset time.Time, date time.Time) kaalamType {
-
+func getKallas(sunrise time.Time, sunset time.Time, date time.Time) (kaalamType, kaalamType, kaalamType) {
 	rahuKaalStartAndEndTime := getRahuKaal(sunrise, sunset, date)
-	return rahuKaalStartAndEndTime
+	yamagandaKaalStartAndEndTime := getYamagandaKaal(sunrise, sunset, date)
+	gulikaKaalStartAndEndTime := getGulikaKaal(sunrise, sunset, date)
+
+	return rahuKaalStartAndEndTime, yamagandaKaalStartAndEndTime, gulikaKaalStartAndEndTime
 }
