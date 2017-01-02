@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"google.golang.org/appengine"
@@ -15,22 +16,42 @@ import (
 
 func init() {
 	http.HandleFunc("/getKaalam", getKaalam)
+	http.HandleFunc("/", handler)
+
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Fprint(w, "Hello, world!")
+	fmt.Fprint(w, "Hello, The API usage is /getKaalam?latitude=39.948184&longitude=-78.902575&date=2013-Feb-03")
 }
 
 func getKaalam(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 	client := urlfetch.Client(ctx)
 	//39.948184, -74.902575
-	latitude := float64(39.948184)
-	longitude := float64(-74.902575)
+	latitude, err := strconv.ParseFloat(r.URL.Query().Get("latitude"), 64)
+	if err != nil {
+		log.Println("cannot parse latitude using default latitude 39.948184")
+		latitude = float64(39.948184)
+		log.Print(err)
+	}
+	longitude, err := strconv.ParseFloat((r.URL.Query().Get("longitude")), 64)
+	if err != nil {
+		log.Println("cannot parse longitude using default longitude -74.902575")
+		longitude = float64(-74.902575)
+		log.Print(err)
+	}
+	date, err := time.Parse("2006-Jan-02", (r.URL.Query().Get("date")))
+	if err != nil {
+		log.Println("cannot parse date using default date = today()")
+		log.Print(err)
+	}
+	//latitude := float64(39.948184)
+	//longitude := float64(-74.902575)
 
 	sunrise, sunset := getSunriseAndSunset(latitude, longitude, client)
-	rahuKaala := getKallas(sunrise, sunset, time.Now())
+	//rahuKaala := getKallas(sunrise, sunset, time.Now())
+	rahuKaala := getKallas(sunrise, sunset, date)
 
 	response := ResponseJSON{}
 	//response.RahuKaalEndTime = rahuKaala.endTime.Format("3:04:05 PM")
