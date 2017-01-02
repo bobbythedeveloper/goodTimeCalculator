@@ -94,26 +94,6 @@ func getRahuKaal(sunrise time.Time, sunset time.Time, date time.Time) kaalamType
 	rahuKaalStartAndEndTime.endTime = rahuKaalStartAndEndTime.startTime.Add(time.Duration(parts * 1000000000))
 	return rahuKaalStartAndEndTime
 }
-func getRahuPosition(datetime time.Time) int64 {
-	switch datetime.Weekday() {
-	case time.Monday:
-		return 0
-	case time.Tuesday:
-		return 5
-	case time.Wednesday:
-		return 3
-	case time.Thursday:
-		return 4
-	case time.Friday:
-		return 2
-	case time.Saturday:
-		return 1
-	case time.Sunday:
-		return 6
-	}
-
-	return 1
-}
 
 func getSunriseAndSunset(lat float64, longt float64, date time.Time, client *http.Client) (time.Time, time.Time) {
 	latstr := fmt.Sprintf("%f", lat)
@@ -164,34 +144,4 @@ func getSunriseAndSunset(lat float64, longt float64, date time.Time, client *htt
 	//	return backendResponse.Results.Sunrise, backendResponse.Results.Sunset
 	return sunriseDateTime, sunsetDateTime
 
-}
-
-type sunRiseSunSet struct {
-	Results struct {
-		Sunrise                   string `json:"sunrise"`
-		Sunset                    string `json:"sunset"`
-		SolarNoon                 string `json:"solar_noon"`
-		DayLength                 string `json:"day_length"`
-		CivilTwilightBegin        string `json:"civil_twilight_begin"`
-		CivilTwilightEnd          string `json:"civil_twilight_end"`
-		NauticalTwilightBegin     string `json:"nautical_twilight_begin"`
-		NauticalTwilightEnd       string `json:"nautical_twilight_end"`
-		AstronomicalTwilightBegin string `json:"astronomical_twilight_begin"`
-		AstronomicalTwilightEnd   string `json:"astronomical_twilight_end"`
-	} `json:"results"`
-	Status string `json:"status"`
-}
-
-type kaalamType struct {
-	startTime time.Time
-	endTime   time.Time
-}
-
-// ResponseJSON object to be sent over network. Newer API to serialize in protobuf
-type ResponseJSON struct {
-	//RahuKaalStartTime string `json:"rahuKaalStartTime"`
-	//	RahuKaalEndTime   string `json:"rahuKaalEndTime"`
-
-	RahuKaalStartTime time.Time `json:"rahuKaalStartTime"`
-	RahuKaalEndTime   time.Time `json:"rahuKaalEndTime"`
 }
